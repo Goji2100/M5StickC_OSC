@@ -8,7 +8,7 @@
 //      MIT https://github.com/chrmlinux/ThreeD
 // @goji2100
 //      MIT https://github.com/Goji2100/M5StickC_OSC
-//      Modified by  for Oscilloscope
+//      Modified for Oscilloscope
 //=========================================================================
 
 // espressif / arduino-esp32  1.0.4
