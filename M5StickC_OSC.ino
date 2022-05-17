@@ -4,17 +4,12 @@
 // M5StickC.ino : chrmlinux / ThreeD / examples / M5StickC
 // Copyright (c) 2022 chrmlinux
 //-------------------------------------------------------------------------
-// 
-@chrmlinux03
-
+// @chrmlinux03
 //      MIT https://github.com/chrmlinux/ThreeD
-// 
-@goji2100
-
+// @goji2100
 //      MIT https://github.com/Goji2100/M5StickC_OSC
 //      Modified by  for Oscilloscope
 //=========================================================================
-
 
 // espressif / arduino-esp32  1.0.4
 // lovyan03  / LovyanGFX      0.4.17
