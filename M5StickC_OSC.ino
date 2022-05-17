@@ -12,7 +12,6 @@
 //=========================================================================
 
 // espressif / arduino-esp32  1.0.4
-// lovyan03  / LovyanGFX      0.4.17
 // m5stack   / M5StickC       0.2.5
 // chrmlinux / ThreeD         0.0.6
 
