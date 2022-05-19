@@ -76,7 +76,7 @@ void sendVideo() {
   for (int i = 0; i < SPR_HH; i++) {
     if (outBuf[i][0]) {
       for (int j = 0; j < outBuf[i][0]; j++) {
-        if (j == 0) dacWrite(26, 256 - (i << 1));
+        if (j == 0) dacWrite(26, 255 - (i << 1));
         for (int l = 0; (l < (MAJIC_NUM / p)); l++)
           dacWrite(25, (outBuf[i][j + 1] << 1));
         if (j == 0) XYZ_ON();
