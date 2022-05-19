@@ -14,6 +14,7 @@
 // espressif / arduino-esp32  1.0.4
 // m5stack   / M5StickC       0.2.5
 // chrmlinux / ThreeD         0.0.6
+// M5StickC_OSC               0.0.2
 
 #include <M5StickC.h>
 TFT_eSprite spr(&M5.Lcd);
@@ -39,6 +40,8 @@ void draw(float fact, uint16_t mdlpt, MDL2D_T *mdl, uint16_t lnkpt, LNK_T *lnk) 
 }
 
 #define XYZ 14      // pin# for z
+#define MAJIC_NUM   800
+
 #if defined ( XYZ )
 
 #define GPIO_OUT_SET_REG *(volatile uint32_t*)0x3FF44008
@@ -53,34 +56,31 @@ void draw(float fact, uint16_t mdlpt, MDL2D_T *mdl, uint16_t lnkpt, LNK_T *lnk) 
 #define XYZ_OFF()   
 #endif
 
-static uint8_t _outBuf[SPR_WW][SPR_WW + 1];
+static uint8_t outBuf[SPR_HH][SPR_WW + 1];
 
 void sendVideo() {
   uint16_t *videoFb = (uint16_t *)spr.frameBuffer(1);
+  int p = 0;
 
   for (int i = 0, v = 0; i < SPR_HH; i++, v += SPR_WW) {
-    _outBuf[i][0] = 0;
+    outBuf[i][0] = 0;
     for (int j = 0, k = 1; j < SPR_WW; j++) {
       if ( *(videoFb + v + j) ) {
-        _outBuf[i][0]++;
-        _outBuf[i][k++] = j;
+        outBuf[i][0]++;
+        outBuf[i][k++] = j;
+        p++;
       }
     }
   }
 
   for (int i = 0; i < SPR_HH; i++) {
-    if (_outBuf[i][0]) {
-      for (int j = 0; j < _outBuf[i][0]; j++) {
+    if (outBuf[i][0]) {
+      for (int j = 0; j < outBuf[i][0]; j++) {
         if (j == 0) dacWrite(26, 256 - (i << 1));
-        dacWrite(25, (_outBuf[i][j + 1] << 1));
+        for (int l = 0; (l < (MAJIC_NUM / p)); l++)
+          dacWrite(25, (outBuf[i][j + 1] << 1));
         if (j == 0) XYZ_ON();
       }
-    } else {
-#if defined( XYZ )
-      XYZ_OFF();
-#else
-      dacWrite(25, 0);
-#endif
     }
     XYZ_OFF();
   }
@@ -95,9 +95,8 @@ void setup(void) {
 
   M5.Lcd.setRotation(1);
   spr.createSprite(SPR_WW, SPR_HH);
-  td.begin();
-  Serial.printf("LCD : %d x %d\n", M5.Lcd.width(), M5.Lcd.height());
   Serial.printf("SPR : %d x %d\n", spr.width(), spr.height());
+  td.begin();
   XYZ_INIT();
 }
 
@@ -105,13 +104,20 @@ void loop(void) {
   float fact = 100.0;
   static uint16_t degy =  0;
 
-  td.rot(ROTY, degy, mdlpt,   mdl, dst3d);
-  td.rot(ROTZ,   24, mdlpt, dst3d, dst3d);
-//td.rot(ROTX,   15, mdlpt, dst3d, dst3d); 
-  td.cnv(view,       mdlpt, dst3d, dst2d);
+  td.rot(ROTY, (degy % 360), mdlpt,   mdl, dst3d);
+  td.rot(ROTZ,   24,         mdlpt, dst3d, dst3d);
+  td.cnv(view,               mdlpt, dst3d, dst2d);
   spr.fillRect(0, 0, spr.width(), spr.height(), TFT_BLACK);
 //spr.setCursor(8, 26); spr.print("y:"); spr.print(degy);
   draw(fact, mdlpt, dst2d, lnkpt, lnk);
 //spr.pushSprite(0, 0);
+
+#if (0)
   ++degy %= 360;
+#else
+  static int rsw = 1;
+  degy += rsw;
+  if ((degy == 0) || (degy >= 360)) rsw = -rsw;
+#endif
+
 }
